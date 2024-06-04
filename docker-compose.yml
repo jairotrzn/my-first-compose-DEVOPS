@@ -1,0 +1,37 @@
+services:
+  nginx:
+    image: nginx:CHANGEME
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./Configs/wordpress.conf:/etc/nginx/conf.d/default.conf
+      - ./php-fpm/:/var/run/php/
+      - ./wordpress/:/var/www/wordpress/
+    depends_on:
+      - php-fpm
+
+  php-fpm:
+    image: php-fpm:CHANGEME
+    restart: always
+    volumes:
+      - ./php-fpm/:/var/run/php/
+      - ./wordpress/:/var/www/wordpress/
+    depends_on:
+      - mysql
+  mysql:
+    image: mariadb
+    restart: always
+    expose:
+      - 3306
+    volumes:
+      - maria_db:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_DATABASE: wordpress
+
+volumes:
+  maria_db:
+  

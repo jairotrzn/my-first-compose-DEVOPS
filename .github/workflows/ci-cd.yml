@@ -1,0 +1,35 @@
+name: mi primer ci cd
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Mi-Primer-CI-CD:
+    runs-on: self-hosted
+    steps:
+      - name: Add SHORT_SHA env property with commit short sha
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+      - name: delete all
+        run: sudo rm -rf *
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Check code sonarqube
+        run: docker compose -f ./sonar/docker-compose.yml up -d 
+      - name: Download and Un tar.gz
+        run: wget https://wordpress.org/latest.tar.gz && tar -xvf latest.tar.gz 
+      - name: Change permissions wordpres folder
+        run: sudo chown 33:33 -R wordpress && mkdir php-fpm && sudo chmod 777 php-fpm
+#      - name: SonarQube Scan
+#        uses: sonarsource/sonarqube-scan-action@master
+#        with:
+#          args: >
+#            -Dsonar.projectKey=wordpress
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+#          SONAR_HOST_URL: ${{ secrets.SONARQUBE_HOST }}
+      - name: build nginx
+        run: docker build -t nginx:${SHORT_SHA} -f ./Dockerfiles/nginx .
+      - name: build php-fpm
+        run: docker build -t php-fpm:${SHORT_SHA} -f ./Dockerfiles/php-fpm .
+      - name: replace tag docker short sha
+        run: sed -i "s/CHANGEME/${SHORT_SHA}/g" docker-compose.yml
+      - name: launch docker compose remote
+        run: docker compose up -d

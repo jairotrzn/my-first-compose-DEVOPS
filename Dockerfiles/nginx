@@ -1,0 +1,13 @@
+FROM ubuntu:latest
+
+LABEL org.opencontainers.image.authors="jjmorae@campusdigitalfp.com"
+
+RUN apt-get update && \
+  apt-get install -yq nginx
+
+RUN rm -f /etc/nginx/sites-available/default && \
+  rm -f /etc/nginx/sites-enabled/default
+  
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

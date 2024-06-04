@@ -1,0 +1,11 @@
+FROM ubuntu:latest
+
+LABEL org.opencontainers.image.authors="jjmorae@campusdigitalfp.com"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+  apt-get install -yq php-fpm php-redis php-mysql \
+  php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip
+  
+CMD ["php-fpm8.1","-R","-F","-c","/etc/php/8.1/fpm/php-fpm.conf"]
